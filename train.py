@@ -12,6 +12,7 @@ from model import train_model_factory
 from serialization import save_object, save_model, save_vocab
 from datetime import datetime
 from util import embedding_size_from_name
+import intel_extension_for_pytorch as ipex
 
 
 def parse_args():
@@ -111,7 +112,8 @@ def parse_args():
 
 def evaluate(model, val_iter, metadata):
     model.eval()  # put models in eval mode (this is important because of dropout)
-
+    model = torch.xpu.optimize(model, dtype=torch.float)
+    model.train()
     total_loss = 0
     with torch.no_grad():
         for batch in val_iter:

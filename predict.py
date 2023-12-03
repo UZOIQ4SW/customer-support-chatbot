@@ -8,6 +8,7 @@ from model import predict_model_factory
 from dataset import field_factory, metadata_factory
 from serialization import load_object
 from constants import MODEL_START_FORMAT
+import intel_extension_for_pytorch as ipex
 
 
 class ModelDecorator(nn.Module):
@@ -84,6 +85,8 @@ def main():
         predict_model_factory(model_args, metadata, get_model_path(args.model_path + os.path.sep, args.epoch), field))
     print('model loaded')
     model.eval()
+    model = torch.xpu.optimize(model, dtype=torch.float)
+    model.train()
 
     question = ''
     print('\n\nBot: Hi, how can I help you?', flush=True)
